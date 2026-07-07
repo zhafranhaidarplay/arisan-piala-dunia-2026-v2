@@ -1,0 +1,42 @@
+name: Update skor Piala Dunia 2026
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-scores
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cek & update skor
+        run: python3 scripts/update_scores.py
+
+      - name: Commit & push jika ada perubahan
+        run: |
+          if git diff --quiet; then
+            echo "Tidak ada perubahan, skip commit."
+          else
+            git config user.name "arisan-score-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add index.html
+            git commit -m "Auto-update skor $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
