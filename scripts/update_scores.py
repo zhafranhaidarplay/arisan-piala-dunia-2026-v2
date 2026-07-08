@@ -245,7 +245,7 @@ def find_matches_block(content):
 def existing_pair_entries(block_text):
     """Cari semua entry {..} dan kembalikan list (home, away, done, raw_text)."""
     entries = []
-    for em in re.finditer(r"\{[^{}]*\}", block_text):
+    for em in re.finditer(r"\{(?:[^{}]|\{[^{}]*\})*\}", block_text):
         raw = em.group(0)
         hm = re.search(r'home:"([^"]+)"', raw)
         am = re.search(r'away:"([^"]+)"', raw)
